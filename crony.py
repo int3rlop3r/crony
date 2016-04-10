@@ -8,13 +8,20 @@ def crony():
     pass
 
 @click.command()
-@click.option('--limit', default=10, help='Number of crons to display, displays 10 by default')
-def ls(limit):
-    ct = Crontab()
+@click.option('--limit', default=10,
+                      help='Number of crons to display, displays 10 by default')
+@click.option('--host', default=None, help='List crons for <host>')
+def ls(limit, host):
+    ct = Crontab(host=host)
     cps = ct.list()
     jobs = utils.parse_file(cps.stdout, limit)
     t = PrettyTable(("ID", "Command", "Expression", "Log File", "Error Log"))
     id_counter = 1
+    
+    if not jobs:
+        click.echo("No crontabs set")
+        return
+
     for job in jobs:
         t.add_row((id_counter, 
                    job.command, 
@@ -22,10 +29,12 @@ def ls(limit):
                    job.log_file,
                    job.error_log_file))
         id_counter += 1
+
     click.echo(t)
 
 @click.command()
-@click.option('--ids', callback=utils.parse_range_callback, help='ids of crons to be deleted.')
+@click.option('--ids', callback=utils.parse_range_callback,
+                      help='ids of crons to be deleted.')
 def rm(ids):
     click.echo("Delete all crons in the system in range: %s!" % ids)
 
