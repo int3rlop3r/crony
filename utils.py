@@ -1,4 +1,6 @@
 import click
+import os
+from builder import Job, Jobs
 
 def parse_range_callback(ctx, param, value):
     """
@@ -6,6 +8,8 @@ def parse_range_callback(ctx, param, value):
     from the commandline
     """
     try:
+        if not value:
+            return set()
         return parse_range(value)
     except (ValueError, TypeError) as ve:
         raise click.BadParameter(str(ve))
@@ -39,3 +43,32 @@ def parse_range(value):
         else:
             cronids.add(int(cron_id))
     return cronids
+
+def parse_file(cronfile, num_lines):
+    """Parses a cron file and returns a Job object"""
+    try:
+        cfd = open(cronfile)
+    except Exception as e:
+        cfd = cronfile
+
+    jobs = Jobs()
+    line_counter = 0
+
+    for line in cfd:
+        cronline = line.decode("utf-8").strip()
+
+        # ignore comments and blank lines
+        if not cronline or cronline[0] == '#':
+            continue
+
+        # add jobs to list
+        job = Job(cronline)
+        jobs.add(job)
+
+        if line_counter < num_lines:
+            line_counter += 1
+        else:
+            break
+
+    cfd.close()
+    return jobs.all()
