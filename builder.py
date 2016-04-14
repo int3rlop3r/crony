@@ -1,4 +1,4 @@
-# from phron.validator import expression_validator
+import expvalidator
 
 class Jobs:
 
@@ -80,9 +80,14 @@ class Job:
             expression_pieces = expression
             self.expression = " ".join(expression)
 
-        # validate the expression part before moving forward
-        # expression_validator.validate(expression_pieces)
-        self._set_cron_fields(expression_pieces)
+        try:
+            expvalidator.validate(expression_pieces)
+            self._set_cron_fields(expression_pieces)
+        except AttributeError:
+            # only care about valid expressions
+            # ignore invalid ones as they could
+            # be an ssh banner.
+            pass
 
     def set_command(self, command):
         """Set the command part"""
@@ -118,13 +123,25 @@ class Job:
             latter_part = latter_part[:comment_start].strip()
 
         # extract the err log part
-        err_log_start = latter_part.find('2>>')
+        err_log_start = latter_part.find('2>')
+        if err_log_start != -1:
+            err_log_part = latter_part[err_log_start:].strip()
+            self.set_error_log_file(err_log_part.lstrip('2>>').strip())
+            latter_part = latter_part[:err_log_start].strip()
+
+        err_log_start = latter_part.find('2>')
         if err_log_start != -1:
             err_log_part = latter_part[err_log_start:].strip()
             self.set_error_log_file(err_log_part.lstrip('2>>').strip())
             latter_part = latter_part[:err_log_start].strip()
 
         # extract the log part
+        log_start = latter_part.find('>')
+        if log_start != -1:
+            log_part = latter_part[log_start:].strip()
+            self.set_log_file(log_part.lstrip('>').strip())
+            latter_part = latter_part[:log_start].strip()
+
         log_start = latter_part.find('>>')
         if log_start != -1:
             log_part = latter_part[log_start:].strip()
