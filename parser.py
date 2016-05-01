@@ -31,7 +31,7 @@ def parse_range(value):
             cronids.add(int(cron_id))
     return cronids
 
-def parse_file(cronfile, num_lines):
+def parse_file(cronfile, num_lines=0):
     """Parses a cron file and returns a Job object"""
     try:
         cfd = open(cronfile)
@@ -52,10 +52,10 @@ def parse_file(cronfile, num_lines):
         job = Job(cronline)
         jobs.add(job)
 
-        if line_counter < num_lines:
-            line_counter += 1
-        else:
+        if num_lines > 0 and line_counter >= num_lines:
             break
+        else:
+            line_counter += 1
 
     cfd.close()
-    return jobs.all()
+    return jobs

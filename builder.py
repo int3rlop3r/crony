@@ -29,6 +29,19 @@ class Jobs:
         """Gets a job by index"""
         return self._jobs[index - 1]
 
+    def merge(self, jobs):
+        self._jobs = self._jobs + jobs._jobs
+        return self
+
+    def in_ids(self, job_ids):
+        """Get jobs that have the ids specified"""
+        _jobs = Jobs()
+        for job_id in job_ids:
+            _job = self.get(job_id)
+            _jobs.add(_job)
+        
+        return _jobs
+
     def all(self):
         """Returns all jobs as a list"""
         return self._jobs
