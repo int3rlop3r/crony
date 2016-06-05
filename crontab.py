@@ -4,29 +4,49 @@ import subprocess
 
 class Crontab:
 
-    def __init__(self, username=None, host=None):
+    def __init__(self, username=None, remote_server=None):
+        self.is_localhost = False
+        localhostnames = ['localhost', '127.0.0.1']
+
         if not username:
             self.username = str(pwd.getpwuid(os.getuid()).pw_name)
 
-        if host and '@' in host:
-            self.host = host
-        elif host:
-            self.host = self.username + '@' + host
+        if remote_server and '@' in remote_server:
+            self.uri = remote_server
+            r_pcs = remote_server.split("@")
+
+            self.username = r_pcs[0]
+            self.hostname = r_pcs[1]
+
+            if self.hostname in localhostnames:
+                self.is_localhost = True
+
+        elif remote_server:
+            self.uri = self.username + '@' + remote_server
+            self.hostname = remote_server
+
+            if remote_server in localhostnames:
+                self.is_localhost = True
         else:
-            self.host = None
+            # username already set above!
+            self.uri = None
+            self.is_localhost = True
+            self.hostname = 'localhost'
 
         self.username_arg = "-u" + self.username
 
-    def _run_command(self, arg, pre_cron=None):
-        if self.host: # and self.host not in ['localhost', '127.0.0.1']: # <- uncomment this!
-            if pre_cron:
-                command_tuple = ("ssh", self.host, pre_cron, "crontab", arg)
+    def _run_command(self, arg=None, command_args=None, shell=False, debug=False):
+        if not command_args:
+            if self.is_localhost: # and self.uri not in ['localhost', '127.0.0.1']: # <- uncomment this!
+                command_args = ("crontab", self.username_arg, arg)
             else:
-                command_tuple = ("ssh", self.host, "crontab", arg)
-        else:
-            command_tuple = ("crontab", self.username_arg, arg)
+                command_args = ("ssh", self.uri, "crontab", arg)
 
-        return subprocess.Popen(command_tuple, stdout=subprocess.PIPE)
+        if debug:
+            print(command_args)
+
+        # execute the command and pipe the output to stdout
+        return subprocess.Popen(command_args, stdout=subprocess.PIPE, shell=shell)
 
     def list(self):
         """Get a list of all the crontabs for the user"""
@@ -36,13 +56,11 @@ class Crontab:
         """Remove all crontabs for the current user"""
         return self._run_command("-r")
 
-    def _install_remote(self, jobs):
-        """Installs jobs on a remote machine"""
-        pass
+    def append(self, s_jobs):
+        """Append a crontab"""
+        if self.is_localhost:
+            command_args = ( "(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs))
+        else:
+            command_args = ( "ssh", self.uri, "(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs))
 
-    def install(self, filepath):
-        """Install a new crontab"""
-        if not os.path.exists(filepath):
-            raise FileNotFound("File doesn't exist: {}".format(filepath))
-
-        return self._run_command(" {}".format(self.username, filepath))
+        return self._run_command(command_args=command_args, debug=True)

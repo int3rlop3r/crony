@@ -30,6 +30,10 @@ class Jobs:
         return self._jobs[index - 1]
 
     def merge(self, jobs):
+        if not isinstance(jobs, Jobs):
+            raise TypeError("Jobs must be of type: 'Jobs'")
+
+        # merge jobs
         self._jobs = self._jobs + jobs._jobs
         return self
 
