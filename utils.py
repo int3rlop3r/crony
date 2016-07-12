@@ -1,6 +1,8 @@
 import sys
 import click
 import parser
+import pwd
+import os
 
 def parse_range_callback(ctx, param, value):
     """Callback function that parses the range entered
@@ -17,3 +19,6 @@ def write_jobs(jobs, file=sys.stdout):
     """Write jobs to a file"""
     for job in jobs:
         print(job, file=file)
+
+def get_username():
+    return str(pwd.getpwuid(os.getuid()).pw_name)

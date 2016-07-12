@@ -1,15 +1,17 @@
 import os
-import pwd
+import utils
 import subprocess
 
 class Crontab:
 
-    def __init__(self, username=None, remote_server=None):
+    def __init__(self, username=None, remote_server=None, port=22, debug=False):
         self.is_localhost = False
+        self.port = str(port)
+        self.debug = debug
         localhostnames = ['localhost', '127.0.0.1']
 
         if not username:
-            self.username = str(pwd.getpwuid(os.getuid()).pw_name)
+            self.username = utils.get_username()
 
         if remote_server and '@' in remote_server:
             self.uri = remote_server
@@ -40,7 +42,7 @@ class Crontab:
             if self.is_localhost: # and self.uri not in ['localhost', '127.0.0.1']: # <- uncomment this!
                 command_args = ("crontab", self.username_arg, arg)
             else:
-                command_args = ("ssh", self.uri, "crontab", arg)
+                command_args = ("ssh", "-p", self.port, self.uri, "crontab", arg)
 
         if debug:
             print(command_args)
@@ -61,6 +63,6 @@ class Crontab:
         if self.is_localhost:
             command_args = ( "(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs))
         else:
-            command_args = ( "ssh", self.uri, "(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs))
+            command_args = ( "ssh", "-p", self.port, self.uri, "(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs))
 
-        return self._run_command(command_args=command_args, debug=True)
+        return self._run_command(command_args=command_args, debug=self.debug)
