@@ -2,6 +2,5 @@ __pycache__/
 venv/
 3.4.2/
 shell/
-test/
 *.py[cod]
 *.swp

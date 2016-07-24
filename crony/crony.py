@@ -1,9 +1,8 @@
 import click
-import utils
-import parser
-import views
 import io
-from crontab import Crontab
+
+from crony import utils, parser, views 
+from crony.crontab import Crontab
 
 @click.group()
 @click.option('--port', default=22, help="Port number")
@@ -94,5 +93,5 @@ def cp(ctx, ids, dst_port, src_hostname, dst_hostname):
 
     click.echo("Done, copied: " + str(len(ids)))
 
-if __name__ == '__main__':
-    crony(obj={})
+# start crony
+crony(obj={})

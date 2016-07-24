@@ -1,8 +1,9 @@
 import sys
 import click
-import parser
 import pwd
 import os
+
+from crony import parser
 
 def parse_range_callback(ctx, param, value):
     """Callback function that parses the range entered

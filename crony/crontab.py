@@ -1,6 +1,6 @@
 import os
-import utils
 import subprocess
+from crony import utils
 
 class Crontab:
 
