@@ -58,7 +58,7 @@ class Jobs:
         if isinstance(job, Job):
             self._jobs.remove(job)
         else:
-            self._job.remove(jobs[job - 1])
+            self._jobs.remove(self._jobs[job - 1])
 
     def clear_all(self):
         self._jobs = []

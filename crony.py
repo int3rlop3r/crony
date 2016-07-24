@@ -30,11 +30,48 @@ def ls(ctx, limit, hostname):
 
 @crony.command()
 @click.pass_context
-@click.option('--ids', callback=utils.parse_range_callback,
-                      help='IDs of crons to be deleted.')
-def rm(ctx, ids):
-    """Delete a crontabs from remote or local system"""
-    click.echo("Delete all crons in the system in range: %s!" % ids)
+@click.option('--ids', default="0", callback=utils.parse_range_callback,
+                      help='IDs of jobs to be deleted.')
+@click.argument('dst_hostname', default=None, required=False)
+def rm(ctx, ids, dst_hostname):
+    """Delete crontabs from a remote or local system"""
+    # dst_ct = Crontab(remote_server=dst_hostname, port=ctx.obj['ssh_port'])
+    hostname = dst_hostname if dst_hostname else 'localhost'
+    confirm_msg = "Deleting all jobs at: %s? (yes/no)" % (hostname,)
+
+    # delete entire crontab
+    if 0 in ids and (click.prompt(confirm_msg) == 'yes'):
+        dst_ct = Crontab(remote_server=dst_hostname, port=ctx.obj['ssh_port'])
+        dst_ps = dst_ct.remove()
+        for out in dst_ps.stdout:
+            click.echo(out)
+        click.echo("Crontab deleted")
+    else:
+        if not click.prompt("Delete selected jobs? (yes/no)") == "yes":
+            return # exit if not confirmed
+
+        # delete selected jobs
+        dst_ct = Crontab(remote_server=hostname, port=ctx.obj['ssh_port'])
+        dst_ps = dst_ct.list()
+        dst_jobs = parser.parse_file(dst_ps.stdout)
+        job_str = io.StringIO()
+
+        for cid in ids:
+            dst_jobs.remove(cid)
+
+        utils.write_jobs(dst_jobs, job_str)
+        rmt_ct = Crontab(remote_server=dst_hostname, port=ctx.obj['ssh_port'])
+
+        # if there was only one jobs, delete the crontab
+        if len(dst_jobs):
+            rmt_ps = rmt_ct.copy_new(job_str.getvalue())
+        else:
+            rmt_ps = rmt_ct.remove()
+
+        for out in rmt_ps.stdout:
+            click.echo(out)
+
+        click.echo("Selected jobs deleted")
 
 @crony.command()
 @click.pass_context
