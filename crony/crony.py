@@ -99,5 +99,9 @@ def cp(ctx, ids, dst_port, src_hostname, dst_hostname):
 
     click.echo("Done, copied: " + str(len(ids)))
 
-# start crony
-crony(obj={})
+def main():
+    crony(obj={})
+
+if __name__ == '__main__':
+    main()
+
