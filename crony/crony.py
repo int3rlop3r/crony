@@ -1,8 +1,12 @@
 import click
-import io
 
-from crony import utils, parser, views 
-from crony.crontab import Crontab
+from . import utils, parser, views
+from .crontab import Crontab
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 @click.group()
 @click.option('--port', default=22, help="Port number")
@@ -50,10 +54,11 @@ def rm(ctx, ids, dst_hostname):
             return # exit if not confirmed
 
         # delete selected jobs
+        click.echo("Fetching remote jobs")
         dst_ct = Crontab(remote_server=hostname, port=ctx.obj['ssh_port'])
         dst_ps = dst_ct.list()
         dst_jobs = parser.parse_file(dst_ps.stdout)
-        job_str = io.StringIO()
+        job_str = StringIO()
 
         for cid in ids:
             dst_jobs.remove(cid)
@@ -61,7 +66,8 @@ def rm(ctx, ids, dst_hostname):
         utils.write_jobs(dst_jobs, job_str)
         rmt_ct = Crontab(remote_server=dst_hostname, port=ctx.obj['ssh_port'])
 
-        # if there was only one jobs, delete the crontab
+        # if there was only one job, delete the crontab
+        click.echo("Applying changes")
         if len(dst_jobs):
             rmt_ps = rmt_ct.copy_new(job_str.getvalue())
         else:
@@ -83,7 +89,7 @@ def cp(ctx, ids, dst_port, src_hostname, dst_hostname):
     src_ct = Crontab(remote_server=src_hostname, port=ctx.obj['ssh_port'])
     src_ps = src_ct.list()
     src_jobs = parser.parse_file(src_ps.stdout).in_ids(ids)
-    job_str = io.StringIO()
+    job_str = StringIO()
     utils.write_jobs(src_jobs, job_str)
 
     dst_ct = Crontab(remote_server=dst_hostname, port=dst_port)

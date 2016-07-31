@@ -1,5 +1,5 @@
 import os
-from crony.builder import Job, Jobs
+from .builder import Job, Jobs
 
 def parse_range(value):
     """

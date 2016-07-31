@@ -1,4 +1,4 @@
-from crony import expvalidator
+from . import expvalidator
 
 class Jobs:
 
@@ -17,6 +17,9 @@ class Jobs:
         if self._index > len(self._jobs):
             raise StopIteration
         return self.get(self._index)
+
+    def next(self):
+        return self.__next__()
 
     def add(self, job):
         """Adds a job to the list"""
