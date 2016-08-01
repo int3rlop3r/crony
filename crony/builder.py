@@ -143,7 +143,7 @@ class Job:
             latter_part = latter_part[:comment_start].strip()
 
         # extract the err log part
-        err_log_start = latter_part.find('2>')
+        err_log_start = latter_part.find('2>>')
         if err_log_start != -1:
             err_log_part = latter_part[err_log_start:].strip()
             self.set_error_log_file(err_log_part.lstrip('2>>').strip())
@@ -152,20 +152,20 @@ class Job:
         err_log_start = latter_part.find('2>')
         if err_log_start != -1:
             err_log_part = latter_part[err_log_start:].strip()
-            self.set_error_log_file(err_log_part.lstrip('2>>').strip())
+            self.set_error_log_file(err_log_part.lstrip('2>').strip())
             latter_part = latter_part[:err_log_start].strip()
 
         # extract the log part
-        log_start = latter_part.find('>')
-        if log_start != -1:
-            log_part = latter_part[log_start:].strip()
-            self.set_log_file(log_part.lstrip('>').strip())
-            latter_part = latter_part[:log_start].strip()
-
         log_start = latter_part.find('>>')
         if log_start != -1:
             log_part = latter_part[log_start:].strip()
             self.set_log_file(log_part.lstrip('>>').strip())
+            latter_part = latter_part[:log_start].strip()
+
+        log_start = latter_part.find('>')
+        if log_start != -1:
+            log_part = latter_part[log_start:].strip()
+            self.set_log_file(log_part.lstrip('>').strip())
             latter_part = latter_part[:log_start].strip()
 
         # finally set the command to run
