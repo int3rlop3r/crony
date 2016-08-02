@@ -1,21 +1,19 @@
 import os
 import subprocess
-from . import utils
 
 class Crontab:
 
-    def __init__(self, username=None, remote_server=None, port=22, debug=False):
+    def __init__(self, username, hostname=None, port=22, debug=False):
         self.is_localhost = False
         self.port = str(port)
         self.debug = debug
         localhostnames = ['localhost', '127.0.0.1']
 
-        if not username:
-            self.username = utils.get_username()
+        self.username = username
 
-        if remote_server and '@' in remote_server:
-            self.uri = remote_server
-            r_pcs = remote_server.split("@")
+        if hostname and '@' in hostname:
+            self.uri = hostname
+            r_pcs = hostname.split("@")
 
             self.username = r_pcs[0]
             self.hostname = r_pcs[1]
@@ -23,11 +21,11 @@ class Crontab:
             if self.hostname in localhostnames:
                 self.is_localhost = True
 
-        elif remote_server:
-            self.uri = self.username + '@' + remote_server
-            self.hostname = remote_server
+        elif hostname:
+            self.uri = self.username + '@' + hostname
+            self.hostname = hostname
 
-            if remote_server in localhostnames:
+            if hostname in localhostnames:
                 self.is_localhost = True
         else:
             # username already set above!

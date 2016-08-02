@@ -1,5 +1,29 @@
 import os
+import click
+from . import utils
 from .builder import Job, Jobs
+
+def parse_range_callback(ctx, param, value):
+    """Callback function that parses the range entered
+    from the commandline
+    """
+    try:
+        if not value:
+            raise ValueError("ids required")
+        return parse_range(value)
+    except (ValueError, TypeError) as ve:
+        raise click.BadParameter(str(ve))
+
+def parse_hostname_callback(ctx, param, value):
+    """Callback function that parses the hostname entered
+    from the commandline
+    """
+    try:
+        if not value:
+            raise ValueError("hostname required")
+        return parse_hostname(value)
+    except (ValueError, TypeError) as ve:
+        raise click.BadParameter(str(ve))
 
 def parse_range(value):
     """
@@ -59,3 +83,32 @@ def parse_file(cronfile, num_lines=0):
 
     cfd.close()
     return jobs
+
+def parse_hostname(hostname):
+    """Parses an ssh hostname into different parts (host, 
+    username, port)
+    """
+    details = {
+        'username': utils.get_username(),
+        'port': '22',
+    }
+
+    # extract username if it exists in the hostname
+    username_start = hostname.find('@')
+    if username_start != -1:
+        details['username'] = hostname[:username_start].strip()
+        hostname = hostname.lstrip(details['username'] + '@')
+        
+
+    # extract the port no. if it exists in the hostname
+    port_start = hostname.find(':')
+    if port_start != -1:
+        port_part = hostname[port_start:]
+        details['port'] = port_part.lstrip(':').strip()
+        hostname = hostname.rstrip(port_part)
+
+    # what ever will be left will be the hostname
+    details['hostname'] = hostname
+
+    return details
+
