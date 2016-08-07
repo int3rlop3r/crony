@@ -1,4 +1,3 @@
-from . import expvalidator
 
 class Jobs:
 
@@ -101,7 +100,6 @@ class Job:
             self.expression = " ".join(expression)
 
         try:
-            expvalidator.validate(expression_pieces)
             self._set_cron_fields(expression_pieces)
         except AttributeError:
             # only care about valid expressions
