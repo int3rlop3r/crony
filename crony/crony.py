@@ -19,7 +19,7 @@ def crony():
                         callback=parser.parse_hostname_callback, 
                         required=False)
 def ls(limit, host):
-    """List crontabs on a remote or local system"""
+    """List cron jobs on a remote or local system"""
     ct = Crontab(**host)
     cps = ct.list()
     jobs = parser.parse_file(cps.stdout, limit)
@@ -37,7 +37,7 @@ def ls(limit, host):
                         callback=parser.parse_hostname_callback, 
                         required=False)
 def rm(ids, dst_host):
-    """Delete crontabs from a remote or local system"""
+    """Delete cron jobs from a remote or local system"""
     confirm_msg = "Deleting all jobs at: %s? (yes/no)" % (dst_host['hostname'],)
 
     # delete entire crontab
@@ -81,7 +81,7 @@ def rm(ids, dst_host):
 @click.argument('src_host', nargs=1, callback=parser.parse_hostname_callback)
 @click.argument('dst_host', nargs=1, callback=parser.parse_hostname_callback)
 def cp(ids, src_host, dst_host):
-    """Copy crontabs across servers"""
+    """Copy cron jobs across servers"""
     src_ct = Crontab(**src_host)
     src_ps = src_ct.list()
     src_jobs = parser.parse_file(src_ps.stdout).in_ids(ids)
