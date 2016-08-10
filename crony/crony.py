@@ -13,8 +13,8 @@ def crony():
     pass
 
 @crony.command()
-@click.option('--limit', default=10,
-                        help="Number of crons to display, displays 10 by default")
+@click.option('--limit', default=0,
+                        help="Number of crons to display, displays all by default")
 @click.argument('host', default='localhost', 
                         callback=parser.parse_hostname_callback, 
                         required=False)
