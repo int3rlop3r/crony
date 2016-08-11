@@ -59,18 +59,22 @@ class Crontab:
     def append(self, s_jobs):
         """Append a crontab"""
         if self.is_localhost:
-            command_args = ("(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs))
+            command_args = "(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs)
+            shell=True
         else:
             command_args = ("ssh", "-p", self.port, self.uri, "(crontab -l 2> /dev/null; printf \"{}\") | crontab -".format(s_jobs))
+            shell=False
 
-        return self._run_command(command_args=command_args, debug=self.debug)
+        return self._run_command(command_args=command_args, shell=shell, debug=self.debug)
 
     def copy_new(self, s_jobs):
         """Install a new crontab overwriting the old one"""
         if self.is_localhost:
-            command_args = ( "(printf \"{}\") | crontab -".format(s_jobs))
+            command_args = "(printf \"{}\") | crontab -".format(s_jobs)
+            shell=True
         else:
-            command_args = ( "ssh", "-p", self.port, self.uri, "(printf \"{}\") | crontab -".format(s_jobs))
+            command_args = ("ssh", "-p", self.port, self.uri, "(printf \"{}\") | crontab -".format(s_jobs))
+            shell=False
 
-        return self._run_command(command_args=command_args, debug=self.debug)
+        return self._run_command(command_args=command_args, shell=shell, debug=self.debug)
 
