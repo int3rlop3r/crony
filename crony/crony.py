@@ -38,7 +38,7 @@ def ls(limit, host):
                         required=False)
 def rm(ids, dst_host):
     """Delete cron jobs from a remote or local system"""
-    confirm_msg = "Deleting all jobs at: %s? (yes/no)" % (dst_host['hostname'],)
+    confirm_msg = "Delete all jobs at: %s? (yes/no)" % (dst_host['hostname'],)
 
     # delete entire crontab
     if 0 in ids and (click.prompt(confirm_msg) == 'yes'):
