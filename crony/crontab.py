@@ -11,20 +11,16 @@ class Crontab:
         self.cronuser_arg = None
         self.is_localhost = False
         self.hostname = hostname
-        self.url = hostname
+        self.uri = hostname
 
         if hostname in localhostnames:
             self.uri = None
             self.is_localhost = True
-            self.hostname = 'localhost'
 
         if username:
             self.is_localhost = False
             self.username = username
-            self.uri = "{}@{}".format(username, hostname)
-
-            self.uri = self.username + '@' + hostname
-            self.hostname = hostname
+            self.uri = self.username + '@' + self.hostname
 
         if cronuser: # not supported yet!!
             self.cronuser_arg = "-u" + self.cronuser
