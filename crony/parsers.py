@@ -63,7 +63,7 @@ def parse_file(cronfile, num_lines=0):
         cfd = cronfile
 
     jobs = Jobs()
-    line_counter = 0
+    line_counter = 1
 
     for line in cfd:
         cronline = line.decode("utf-8").strip()
