@@ -89,7 +89,6 @@ def parse_hostname(hostname):
     username, port)
     """
     details = {
-        'username': utils.get_username(),
         'port': '22',
     }
 

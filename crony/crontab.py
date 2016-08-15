@@ -3,46 +3,44 @@ import subprocess
 
 class Crontab:
 
-    def __init__(self, username, hostname=None, port=22, debug=False):
-        self.is_localhost = False
+    def __init__(self, hostname, username=None, port=22, cronuser=None, debug=False):
+        localhostnames = ['localhost', '127.0.0.1', '0.0.0.0']
+
         self.port = str(port)
         self.debug = debug
-        localhostnames = ['localhost', '127.0.0.1']
+        self.cronuser_arg = None
+        self.is_localhost = False
+        self.hostname = hostname
+        self.url = hostname
 
-        self.username = username
-
-        if hostname and '@' in hostname:
-            self.uri = hostname
-            r_pcs = hostname.split("@")
-
-            self.username = r_pcs[0]
-            self.hostname = r_pcs[1]
-
-            if self.hostname in localhostnames:
-                self.is_localhost = True
-
-        elif hostname:
-            self.uri = self.username + '@' + hostname
-            self.hostname = hostname
-
-            if hostname in localhostnames:
-                self.is_localhost = True
-        else:
-            # username already set above!
+        if hostname in localhostnames:
             self.uri = None
             self.is_localhost = True
             self.hostname = 'localhost'
 
-        self.username_arg = "-u" + self.username
+        if username:
+            self.is_localhost = False
+            self.username = username
+            self.uri = "{}@{}".format(username, hostname)
+
+            self.uri = self.username + '@' + hostname
+            self.hostname = hostname
+
+        if cronuser: # not supported yet!!
+            self.cronuser_arg = "-u" + self.cronuser
 
     def _run_command(self, arg=None, command_args=None, shell=False, debug=False):
         if not command_args:
-            if self.is_localhost: # and self.uri not in ['localhost', '127.0.0.1']: # <- uncomment this!
-                command_args = ("crontab", self.username_arg, arg)
+            if self.is_localhost and self.cronuser_arg:
+                # interact with another user's crontab
+                command_args = ("crontab", self.cronuser_arg, arg)
+            elif self.is_localhost:
+                command_args = ("crontab", arg)
             else:
                 command_args = ("ssh", "-p", self.port, self.uri, "crontab", arg)
 
         if debug:
+            print("Debug msg:")
             print(command_args)
 
         # execute the command and pipe the output to stdout
@@ -50,7 +48,7 @@ class Crontab:
 
     def list(self):
         """Get a list of all the crontabs for the user"""
-        return self._run_command("-l")
+        return self._run_command("-l", debug=self.debug)
 
     def remove(self):
         """Remove all crontabs for the current user"""
