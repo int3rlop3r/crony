@@ -11,3 +11,4 @@ def write_jobs(jobs, file=sys.stdout):
 
 def get_username():
     return str(pwd.getpwuid(os.getuid()).pw_name)
+
