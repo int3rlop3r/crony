@@ -1,6 +1,6 @@
 # crony
-crony is a tool that helps you manage crontabs that are present on your
-local machine (as well as remote) right out of your terminal.
+crony is a tool that helps you manage crontabs on your local and remote 
+machines right out of your terminal.
 
 ### Features
 
