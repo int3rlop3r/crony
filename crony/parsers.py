@@ -46,7 +46,7 @@ def parse_range(value):
             start_idx = int(cron_id_pcs[0])
             end_idx = int(cron_id_pcs[1]) + 1
 
-            if start_idx < 0 or end_idx < start_idx:
+            if not 0 < start_idx < end_idx:
                 raise ValueError("Invalid range: %s" % cron_id)
 
             for cid in range(start_idx, end_idx):
@@ -55,18 +55,23 @@ def parse_range(value):
             cronids.add(int(cron_id))
     return cronids
 
-def parse_file(cronfile, num_lines=0):
+def parse_file(cronfd=None, cronfile=None, num_lines=0):
     """Parses a cron file and returns a Job object"""
-    try:
+    if cronfile:
         cfd = open(cronfile)
-    except Exception as e:
-        cfd = cronfile
+    elif cronfd:
+        cfd = cronfd
+    else:
+        raise ValueError("No stream or file path mentioned")
 
-    jobs = Jobs()
+    joblist = []
     line_counter = 1
 
     for line in cfd:
-        cronline = line.decode("utf-8").strip()
+        if hasattr(line, 'decode'):
+            cronline = line.decode("utf-8").strip()
+        else:
+            cronline = line.strip()
 
         # ignore comments and blank lines
         if not cronline or cronline[0] == '#':
@@ -74,7 +79,7 @@ def parse_file(cronfile, num_lines=0):
 
         # add jobs to list
         job = Job(cronline)
-        jobs.add(job)
+        joblist.append(job)
 
         if num_lines > 0 and line_counter >= num_lines:
             break
@@ -82,7 +87,7 @@ def parse_file(cronfile, num_lines=0):
             line_counter += 1
 
     cfd.close()
-    return jobs
+    return Jobs(joblist)
 
 def parse_hostname(hostname):
     """Parses an ssh hostname into different parts (host, 

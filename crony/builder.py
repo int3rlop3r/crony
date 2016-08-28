@@ -40,12 +40,11 @@ class Jobs:
 
     def in_ids(self, job_ids):
         """Get jobs that have the ids specified"""
-        _jobs = Jobs()
+        j = []
         for job_id in job_ids:
-            _job = self.get(job_id)
-            _jobs.add(_job)
+            j.append(self.get(job_id))
         
-        return _jobs
+        return Jobs(j)
 
     def all(self):
         """Returns all jobs as a list"""

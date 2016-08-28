@@ -1,0 +1,3 @@
+* * * * * ls /tmp/*.csv >> /tmp/out.log 2>> /tmp/err.out.log
+*/60 * * * * /tmp/createfile.sh
+*/60 * * * * /tmp/createfile.sh

@@ -1,4 +1,3 @@
-import os
 import unittest
 from crony.builder import Job, Jobs
 
@@ -99,7 +98,7 @@ class TestJobs(unittest.TestCase):
     def test_in_ids(self):
         jobs = Jobs([self.job1, self.job2, self.job3, self.job4, self.job5])
 
-        subjobs = jobs.in_ids((1, 2, 5))
+        subjobs = jobs.in_ids([1, 2, 5])
         self.assertEquals(self.job1, subjobs.get(1))
         self.assertEquals(self.job2, subjobs.get(2))
         self.assertEquals(self.job5, subjobs.get(3))

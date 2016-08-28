@@ -22,7 +22,7 @@ def ls(limit, host):
     """List cron jobs on a remote or local system"""
     ct = Crontab(**host)
     cps = ct.list()
-    jobs = parsers.parse_file(cps.stdout, limit)
+    jobs = parsers.parse_file(cronfd=cps.stdout, num_lines=limit)
 
     if not jobs:
         return
@@ -55,7 +55,7 @@ def rm(ids, dst_host):
         click.echo("Fetching remote jobs")
         dst_ct = Crontab(**dst_host)
         dst_ps = dst_ct.list()
-        dst_jobs = parsers.parse_file(dst_ps.stdout)
+        dst_jobs = parsers.parse_file(cronfd=dst_ps.stdout)
         rm_jobs = dst_jobs.in_ids(ids)
         job_str = StringIO()
 
@@ -85,7 +85,7 @@ def cp(ids, src_host, dst_host):
     """Copy cron jobs across servers"""
     src_ct = Crontab(**src_host)
     src_ps = src_ct.list()
-    src_jobs = parsers.parse_file(src_ps.stdout).in_ids(ids)
+    src_jobs = parsers.parse_file(cronfd=src_ps.stdout).in_ids(ids)
     job_str = StringIO()
     utils.write_jobs(src_jobs, job_str)
 
