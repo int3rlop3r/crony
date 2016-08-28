@@ -1,9 +1,9 @@
 
 class Jobs:
 
-    def __init__(self):
+    def __init__(self, jobs=[]):
         self._index = 0
-        self._jobs = []
+        self._jobs = jobs
 
     def __len__(self):
         return len(self._jobs)
@@ -17,8 +17,7 @@ class Jobs:
             raise StopIteration
         return self.get(self._index)
 
-    def next(self):
-        return self.__next__()
+    next = __next__
 
     def add(self, job):
         """Adds a job to the list"""
@@ -53,14 +52,8 @@ class Jobs:
         return self._jobs
 
     def remove(self, job):
-        """Removes a job from the list
-        If job is an int it will remove by index
-        If job is an instance it will remove by instance
-        """
-        if isinstance(job, Job):
-            self._jobs.remove(job)
-        else:
-            self._jobs.remove(self._jobs[job - 1])
+        """Removes a job from the list"""
+        self._jobs.remove(job)
 
     def clear_all(self):
         self._jobs = []
