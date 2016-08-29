@@ -31,3 +31,23 @@ class TestParsers(unittest.TestCase):
         parsers.parse_file(cronfd=open(BASEPATH + 'cronfile'))
         self.assertEquals(len(jobs1), 3)
 
+    def test_parse_hostname(self):
+        host_details1 = parsers.parse_hostname('somedomain.com')
+        host_and_port = {'hostname':'somedomain.com', 'port':'22'}
+        self.assertEquals(host_details1, host_and_port)
+
+        host_details2 = parsers.parse_hostname('someuser@somedomain.com')
+        user_host_and_port = {
+            'username':'someuser',
+            'hostname':'somedomain.com',
+            'port':'22'
+        }
+        self.assertEquals(host_details2, user_host_and_port)
+
+        user_host_and_customport = {
+            'username':'someuser',
+            'hostname':'somedomain.com',
+            'port':'5200'
+        }
+        host_details3 = parsers.parse_hostname('someuser@somedomain.com:5200')
+        self.assertEquals(host_details3, user_host_and_customport)

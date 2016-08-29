@@ -101,14 +101,14 @@ def parse_hostname(hostname):
     username_start = hostname.find('@')
     if username_start != -1:
         details['username'] = hostname[:username_start].strip()
-        hostname = hostname.lstrip(details['username'] + '@')
+        hostname = hostname[username_start + 1:]
 
     # extract the port no. if it exists in the hostname
     port_start = hostname.find(':')
     if port_start != -1:
         port_part = hostname[port_start:]
         details['port'] = port_part.lstrip(':').strip()
-        hostname = hostname.rstrip(port_part)
+        hostname = hostname[:port_start]
 
     # what ever will be left will be the hostname
     details['hostname'] = hostname
