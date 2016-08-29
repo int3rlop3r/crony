@@ -1,6 +1,11 @@
 __pycache__/
-venv/
-3.4.2/
-shell/
 *.py[cod]
-*.swp
+
+build/
+crony.egg-info/
+dist/
+
+*.sw*
+
+venv3/
+venv2/
