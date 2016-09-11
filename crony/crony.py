@@ -1,6 +1,7 @@
 import click
 
-from . import utils, parsers, views
+from . import utils, views
+from . import parsers as p
 from .crontab import Crontab
 
 try:
@@ -14,15 +15,15 @@ def crony():
 
 @crony.command()
 @click.option('--limit', default=0,
-                        help="Number of crons to display, displays all by default")
+                help="Number of crons to display, displays all by default")
 @click.argument('host', default='localhost', 
-                        callback=parsers.parse_hostname_callback, 
+                        callback=p.parse_hostname_callback, 
                         required=False)
 def ls(limit, host):
     """List cron jobs on a remote or local system"""
     ct = Crontab(**host)
     cps = ct.list()
-    jobs = parsers.parse_file(cronfd=cps.stdout, num_lines=limit)
+    jobs = p.parse_file(cronfd=cps.stdout, num_lines=limit)
 
     if not jobs:
         return
@@ -31,10 +32,10 @@ def ls(limit, host):
     click.echo(views.horizontal_table(jobs))
 
 @crony.command()
-@click.option('--ids', default="0", callback=parsers.parse_range_callback,
+@click.option('--ids', default="0", callback=p.parse_range_callback,
                       help='IDs of jobs to be deleted.')
 @click.argument('dst_host', default='localhost', 
-                        callback=parsers.parse_hostname_callback, 
+                        callback=p.parse_hostname_callback, 
                         required=False)
 def rm(ids, dst_host):
     """Delete cron jobs from a remote or local system"""
@@ -55,7 +56,7 @@ def rm(ids, dst_host):
         click.echo("Fetching remote jobs")
         dst_ct = Crontab(**dst_host)
         dst_ps = dst_ct.list()
-        dst_jobs = parsers.parse_file(cronfd=dst_ps.stdout)
+        dst_jobs = p.parse_file(cronfd=dst_ps.stdout)
         rm_jobs = dst_jobs.in_ids(ids)
         job_str = StringIO()
 
@@ -78,14 +79,15 @@ def rm(ids, dst_host):
         click.echo("Selected jobs deleted")
 
 @crony.command()
-@click.option('--ids', callback=parsers.parse_range_callback, help="IDs of crons to be deleted.")
-@click.argument('src_host', nargs=1, callback=parsers.parse_hostname_callback)
-@click.argument('dst_host', nargs=1, callback=parsers.parse_hostname_callback)
+@click.option('--ids', callback=p.parse_range_callback,
+                help="IDs of crons to be deleted.")
+@click.argument('src_host', nargs=1, callback=p.parse_hostname_callback)
+@click.argument('dst_host', nargs=1, callback=p.parse_hostname_callback)
 def cp(ids, src_host, dst_host):
     """Copy cron jobs across servers"""
     src_ct = Crontab(**src_host)
     src_ps = src_ct.list()
-    src_jobs = parsers.parse_file(cronfd=src_ps.stdout).in_ids(ids)
+    src_jobs = p.parse_file(cronfd=src_ps.stdout).in_ids(ids)
     job_str = StringIO()
     utils.write_jobs(src_jobs, job_str)
 
