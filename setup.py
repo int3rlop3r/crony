@@ -14,6 +14,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        crony=crony.crony:main
+        crony=crony.crony:crony
     ''',
 )

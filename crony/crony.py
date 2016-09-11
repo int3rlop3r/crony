@@ -98,9 +98,6 @@ def cp(ids, src_host, dst_host):
 
     click.echo("Done, copied: " + str(len(ids)))
 
-def main():
-    crony()
-
 if __name__ == '__main__':
-    main()
+    crony()
 
