@@ -5,11 +5,11 @@ class TestJob(unittest.TestCase):
 
     def test_setters_and_getters(self):
         job = Job()
-        job.set_expression('* * * * *')
-        job.set_command('ls')
-        job.set_log_file('out.log')
-        job.set_error_log_file('err_out.log')
-        job.set_comments('Hey this is a comment')
+        job.expression = '* * * * *'
+        job.command = 'ls'
+        job.log_file = 'out.log'
+        job.error_log_file = 'err_out.log'
+        job.comments = 'Hey this is a comment'
 
         # test expression part
         self.assertEquals(job.minute, '*')
@@ -27,7 +27,7 @@ class TestJob(unittest.TestCase):
     def test_parse_job_line(self):
         line = "* * * * * ls >> out.log 2>> err_out.log"
         job = Job()
-        job.parse_line(line)
+        job.line = line
 
         # test expression part
         self.assertEquals(job.expression, '* * * * *')
@@ -44,10 +44,10 @@ class TestJob(unittest.TestCase):
         self.assertEquals(job.comments, '')
         self.assertEquals(job.comments, '')
 
-    def test_render(self):
+    def test_job_line(self):
         line = "* * * * * ls >> out.log"
         job = Job(line)
-        self.assertEquals(job.render(), line)
+        self.assertEquals(job.line, line)
         self.assertEquals(str(job), line)
 
 class TestJobs(unittest.TestCase):
@@ -126,5 +126,5 @@ class TestJobs(unittest.TestCase):
         joblist = [self.job1, self.job2, self.job3, self.job4, self.job5]
         jobs = Jobs(joblist[:])
         for index, job in enumerate(jobs):
-            self.assertEquals(job.render(), joblist[index].render())
+            self.assertEquals(job.line, joblist[index].line)
 

@@ -57,111 +57,67 @@ class Jobs:
     def clear_all(self):
         self._jobs = []
 
-class Job:
+MINUTE = 0
+HOUR = 1
+DAY_OF_MONTH = 2
+MONTH = 3
+DAY_OF_WEEK = 4
+
+class Job(object):
     
-    def __init__(self, crontab_line=""):
+    def __init__(self, job_line=""):
         # Set default values for all job fields
         self.command = ''
         self.comments = ''
         self.log_file = ''
         self.error_log_file = ''
+        self._exp_fields = []
 
-        self.crontab_line = crontab_line
-        if crontab_line:
-            self.parse_line(crontab_line)
+        if job_line:
+            self.line = job_line
 
     def __str__(self):
-        return self.render()
+        return self.line
 
-    def _set_cron_fields(self, fields):
-        """Assign each part of the expression to a field"""
-        self.minute = fields[0]
-        self.hour = fields[1]
-        self.day_of_month = fields[2]
-        self.month = fields[3]
-        self.day_of_week = fields[4]
+    @property
+    def minute(self):
+        return self._exp_fields[MINUTE]
 
-    def set_expression(self, expression):
+    @property
+    def hour(self):
+        return self._exp_fields[HOUR]
+
+    @property
+    def day_of_month(self):
+        return self._exp_fields[DAY_OF_MONTH]
+
+    @property
+    def month(self):
+        return self._exp_fields[MONTH]
+
+    @property
+    def day_of_week(self):
+        return self._exp_fields[DAY_OF_WEEK]
+
+    @property
+    def expression(self):
+        return "{0} {1} {2} {3} {4}".format(
+                        self.minute,
+                        self.hour,
+                        self.day_of_month,
+                        self.month,
+                        self.day_of_week)
+
+    @expression.setter
+    def expression(self, expression):
         """Set the crontab expression"""
-
-        if isinstance(expression, str):
-            expression_pieces = expression.split()
-            self.expression = expression
+        if type(expression) is list:
+            self._exp_fields = expression
         else:
-            expression_pieces = expression
-            self.expression = " ".join(expression)
+            self._exp_fields = expression.split()
 
-        try:
-            self._set_cron_fields(expression_pieces)
-        except AttributeError:
-            # only care about valid expressions
-            # ignore invalid ones as they could
-            # be an ssh banner.
-            pass
-
-    def set_command(self, command):
-        """Set the command part"""
-        self.command = command
-
-    def set_log_file(self, log_file):
-        """Set the path to the log file"""
-        self.log_file = log_file
-
-    def set_error_log_file(self, err_log_file):
-        """Set the path to the error log file"""
-        self.error_log_file = err_log_file
-
-    def set_comments(self, comments):
-        """Add comments"""
-        self.comments = comments
-
-    def parse_line(self, crontab_line):
-        """Parse a crontab line"""
-        crontab_pieces = crontab_line.split()
-
-        # set the expression part
-        self.set_expression(crontab_pieces[:5])
-
-        # set the latter part of the job
-        latter_part = ' '.join(crontab_pieces[5:])
-
-        # extract the comment part
-        comment_start = latter_part.find('#')
-        if comment_start != -1:
-            comments_part = latter_part[comment_start:].strip()
-            self.set_comments(comments_part.lstrip('#').strip())
-            latter_part = latter_part[:comment_start].strip()
-
-        # extract the err log part
-        err_log_start = latter_part.find('2>>')
-        if err_log_start != -1:
-            err_log_part = latter_part[err_log_start:].strip()
-            self.set_error_log_file(err_log_part.lstrip('2>>').strip())
-            latter_part = latter_part[:err_log_start].strip()
-
-        err_log_start = latter_part.find('2>')
-        if err_log_start != -1:
-            err_log_part = latter_part[err_log_start:].strip()
-            self.set_error_log_file(err_log_part.lstrip('2>').strip())
-            latter_part = latter_part[:err_log_start].strip()
-
-        # extract the log part
-        log_start = latter_part.find('>>')
-        if log_start != -1:
-            log_part = latter_part[log_start:].strip()
-            self.set_log_file(log_part.lstrip('>>').strip())
-            latter_part = latter_part[:log_start].strip()
-
-        log_start = latter_part.find('>')
-        if log_start != -1:
-            log_part = latter_part[log_start:].strip()
-            self.set_log_file(log_part.lstrip('>').strip())
-            latter_part = latter_part[:log_start].strip()
-
-        # finally set the command to run
-        self.set_command(latter_part)
-
-    def render(self):
+    @property
+    def line(self):
         """Creates a crontab string from all params passed"""
         cron_string = self.expression + ' ' + self.command
 
@@ -175,4 +131,51 @@ class Job:
             cron_string += ' # ' + self.comments
 
         return cron_string
+
+    @line.setter
+    def line(self, job_line):
+        """Parse a crontab line"""
+        crontab_pieces = job_line.split()
+
+        # set the expression part
+        self.expression = crontab_pieces[:5]
+
+        # set the latter part of the job
+        latter_part = ' '.join(crontab_pieces[5:])
+
+        # extract the comment part
+        comment_start = latter_part.find('#')
+        if comment_start != -1:
+            comments_part = latter_part[comment_start:].strip()
+            self.comments = comments_part.lstrip('#').strip()
+            latter_part = latter_part[:comment_start].strip()
+
+        # extract the err log part
+        err_log_start = latter_part.find('2>>')
+        if err_log_start != -1:
+            err_log_part = latter_part[err_log_start:].strip()
+            self.error_log_file = err_log_part.lstrip('2>>').strip()
+            latter_part = latter_part[:err_log_start].strip()
+
+        err_log_start = latter_part.find('2>')
+        if err_log_start != -1:
+            err_log_part = latter_part[err_log_start:].strip()
+            self.error_log_file = err_log_part.lstrip('2>').strip()
+            latter_part = latter_part[:err_log_start].strip()
+
+        # extract the log part
+        log_start = latter_part.find('>>')
+        if log_start != -1:
+            log_part = latter_part[log_start:].strip()
+            self.log_file = log_part.lstrip('>>').strip()
+            latter_part = latter_part[:log_start].strip()
+
+        log_start = latter_part.find('>')
+        if log_start != -1:
+            log_part = latter_part[log_start:].strip()
+            self.log_file = log_part.lstrip('>').strip()
+            latter_part = latter_part[:log_start].strip()
+
+        # finally set the command to run
+        self.command = latter_part
 
