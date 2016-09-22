@@ -27,8 +27,7 @@ sshd daemon? With crony all you would need to do is:
     | 1  | /tmp/createfile.sh | */10 * * * * |              |                  |
     +----+--------------------+--------------+--------------+------------------+
 
-crony can copy crontabs across servers as well as delete remote cron jobs. But 
-that's not all! Keep watching this page as we build more features into crony.
+crony can also copy and delete jobs across servers - more features yet to come!
 
 ### Installation
 
