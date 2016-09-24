@@ -69,7 +69,7 @@ def rm(ids, dst_host):
         # if there was only one job, delete the crontab
         click.echo("Applying changes")
         if len(dst_jobs):
-            rmt_ps = rmt_ct.copy_new(job_str.getvalue())
+            rmt_ps = rmt_ct.install(job_str.getvalue())
         else:
             rmt_ps = rmt_ct.remove()
 

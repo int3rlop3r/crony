@@ -61,7 +61,7 @@ class Crontab:
 
         return self._run_command(command_args=command_args, shell=shell, debug=self.debug)
 
-    def copy_new(self, s_jobs):
+    def install(self, s_jobs):
         """Install a new crontab overwriting the old one"""
         if self.is_localhost:
             command_args = "(printf \"{}\") | crontab -".format(s_jobs)
