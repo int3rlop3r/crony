@@ -68,6 +68,13 @@ class CommandBuilder(object):
 
         return Command(args=command_args, shell=shell)
 
+    def _edit(self, command_args):
+        if self.is_localhost:
+            shell = True # <- for local
+        else:
+            shell = False  # <- for remote
+        return self.buildcommand(command_args=command_args, shell=shell)
+
     def list(self):
         return self.buildcommand(["-l"])
 
@@ -75,23 +82,12 @@ class CommandBuilder(object):
         return self.buildcommand(["-r"])
 
     def append(self, jobs):
-        shell = True # <- for local
-        command_args = ["(crontab -l 2> /dev/null; "
-                        "printf \"" + jobs + "\") "
-                        "| crontab -"]
-
-        if not self.is_localhost:
-            shell = False  # <- for remote
-
-        return self.buildcommand(command_args=command_args, shell=shell)
+        return self._edit(["(crontab -l 2> /dev/null; "
+                           "printf \"" + jobs + "\") "
+                           "| crontab -"])
 
     def install(self, jobs):
-        shell = True # <- for local
-        command_args = ["(printf \"" + jobs + "\") | crontab -"]
-        if not self.is_localhost:
-            shell = False  # <- for remote
-
-        return self.buildcommand(command_args=command_args, shell=shell)
+        return self._edit(["(printf \"" + jobs + "\") | crontab -"])
 
 class Crontab:
 
