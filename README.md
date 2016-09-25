@@ -1,10 +1,9 @@
 # Crony
-Crony is a tool that helps you manage all your cron tabs in one place.
+Crony is a tool that helps you manage all your crontabs in one place.
 
 ### Features
 
-Let's say you want to list the cron jobs present on your local machine. With
-Crony all you need to do is:
+List jobs present on your local machine:
 
     $ crony ls
     +----+--------------------+--------------+--------------+------------------+
@@ -14,19 +13,19 @@ Crony all you need to do is:
     | 2  | /tmp/createfile.sh | */6 * * * *  |              |                  |
     +----+--------------------+--------------+--------------+------------------+
 
-Well this may not be impressive as you can achieve the same thing using the
-default crontab command (crontab -l), but what if you want to list the cron jobs
-present on a remote server? Or a docker container that's running an
-sshd daemon? With Crony all you would need to do is:
+List jobs on a remote machine:
 
-    $ crony ls root@0.0.0.0:32768 
-    +----+--------------------+--------------+--------------+------------------+
-    | ID |      Command       |  Expression  |   Log File   |    Error Log     |
-    +----+--------------------+--------------+--------------+------------------+
-    | 1  | /tmp/createfile.sh | */10 * * * * |              |                  |
-    +----+--------------------+--------------+--------------+------------------+
+    $ crony ls root@localhost:32768 
+    root@localhost's password: 
+    +----+--------------+------------+---------------+-------------------+
+    | ID |   Command    | Expression |    Log File   |     Error Log     |
+    +----+--------------+------------+---------------+-------------------+
+    | 1  | /tmp/blah.sh | 58 * * * * | /tmp/blah.log | /tmp/blah.err.log |
+    +----+--------------+------------+---------------+-------------------+
 
-Crony can also copy and delete jobs across servers - more features yet to come!
+Crony can also copy and delete jobs across servers.
+
+Missing a feature? - Add an Issue! (;
 
 ### Installation
 
