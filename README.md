@@ -1,11 +1,10 @@
-# crony
-crony is a tool that helps you manage crontabs on your local and remote 
-machines right out of your terminal.
+# Crony
+Crony is a tool that helps you manage all your cron tabs in one place.
 
 ### Features
 
 Let's say you want to list the cron jobs present on your local machine. With
-crony all you need to do is:
+Crony all you need to do is:
 
     $ crony ls
     +----+--------------------+--------------+--------------+------------------+
@@ -18,7 +17,7 @@ crony all you need to do is:
 Well this may not be impressive as you can achieve the same thing using the
 default crontab command (crontab -l), but what if you want to list the cron jobs
 present on a remote server? Or a docker container that's running an
-sshd daemon? With crony all you would need to do is:
+sshd daemon? With Crony all you would need to do is:
 
     $ crony ls root@0.0.0.0:32768 
     +----+--------------------+--------------+--------------+------------------+
@@ -27,8 +26,7 @@ sshd daemon? With crony all you would need to do is:
     | 1  | /tmp/createfile.sh | */10 * * * * |              |                  |
     +----+--------------------+--------------+--------------+------------------+
 
-crony can copy crontabs across servers as well as delete remote cron jobs. But 
-that's not all! Keep watching this page as we build more features into crony.
+Crony can also copy and delete jobs across servers - more features yet to come!
 
 ### Installation
 
