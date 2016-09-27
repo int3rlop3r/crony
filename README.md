@@ -1,4 +1,4 @@
-# Crony
+# Crony [![Build Status](https://scrutinizer-ci.com/g/int3rlop3r/crony/badges/build.png?b=master)](https://scrutinizer-ci.com/g/int3rlop3r/crony/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/int3rlop3r/crony/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/int3rlop3r/crony/?branch=master)
 Crony is a tool that helps you manage all your crontabs in one place.
 
 ### Features
