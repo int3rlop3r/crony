@@ -1,5 +1,5 @@
 # Crony [![Build Status](https://scrutinizer-ci.com/g/int3rlop3r/crony/badges/build.png?b=master)](https://scrutinizer-ci.com/g/int3rlop3r/crony/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/int3rlop3r/crony/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/int3rlop3r/crony/?branch=master)
-Crony is a tool that helps you manage all your crontabs in one place.
+Crony is a tool that helps you manage remote and local crontabs all in one place.
 
 ### Features
 
@@ -13,10 +13,10 @@ List jobs present on your local machine:
     | 2  | /tmp/createfile.sh | */6 * * * *  |              |                  |
     +----+--------------------+--------------+--------------+------------------+
 
-List jobs on a remote machine:
+List jobs on a remote machine (sshd port: 32768):
 
-    $ crony ls root@localhost:32768 
-    root@localhost's password: 
+    $ crony ls root@remote.server.com:32768 
+    root@remote.server.com's password: 
     +----+--------------+------------+---------------+-------------------+
     | ID |   Command    | Expression |    Log File   |     Error Log     |
     +----+--------------+------------+---------------+-------------------+
