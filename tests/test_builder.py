@@ -42,7 +42,6 @@ class TestJob(unittest.TestCase):
         self.assertEquals(job.log_file, 'out.log')
         self.assertEquals(job.error_log_file, 'err_out.log')
         self.assertEquals(job.comments, '')
-        self.assertEquals(job.comments, '')
 
     def test_job_line(self):
         line = "* * * * * ls >> out.log"
