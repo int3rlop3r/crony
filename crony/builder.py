@@ -1,3 +1,4 @@
+from collections import OrderedDict
 
 class Jobs:
 
@@ -137,45 +138,27 @@ class Job(object):
         """Parse a crontab line"""
         crontab_pieces = job_line.split()
 
-        # set the expression part
+        # strip the expression from the job line
         self.expression = crontab_pieces[:5]
-
-        # set the latter part of the job
         latter_part = ' '.join(crontab_pieces[5:])
 
-        # extract the comment part
-        comment_start = latter_part.find('#')
-        if comment_start != -1:
-            comments_part = latter_part[comment_start:].strip()
-            self.comments = comments_part.lstrip('#').strip()
-            latter_part = latter_part[:comment_start].strip()
+        delim_map = OrderedDict([
+            ('#', 'comments'),
+            ('2>>', 'error_log_file'),
+            ('2>', 'error_log_file'),
+            ('>>', 'log_file'),
+            ('>', 'log_file'),
+        ])
 
-        # extract the err log part
-        err_log_start = latter_part.find('2>>')
-        if err_log_start != -1:
-            err_log_part = latter_part[err_log_start:].strip()
-            self.error_log_file = err_log_part.lstrip('2>>').strip()
-            latter_part = latter_part[:err_log_start].strip()
+        # parse what's left of the job line
+        for delim in delim_map:
+            start_ptr = latter_part.find(delim)
+            if start_ptr == -1:
+                continue
+            tmp = latter_part[start_ptr:].strip()
+            self.__dict__[delim_map[delim]] = tmp.lstrip(delim).strip()
+            latter_part = latter_part[:start_ptr].strip()
 
-        err_log_start = latter_part.find('2>')
-        if err_log_start != -1:
-            err_log_part = latter_part[err_log_start:].strip()
-            self.error_log_file = err_log_part.lstrip('2>').strip()
-            latter_part = latter_part[:err_log_start].strip()
-
-        # extract the log part
-        log_start = latter_part.find('>>')
-        if log_start != -1:
-            log_part = latter_part[log_start:].strip()
-            self.log_file = log_part.lstrip('>>').strip()
-            latter_part = latter_part[:log_start].strip()
-
-        log_start = latter_part.find('>')
-        if log_start != -1:
-            log_part = latter_part[log_start:].strip()
-            self.log_file = log_part.lstrip('>').strip()
-            latter_part = latter_part[:log_start].strip()
-
-        # finally set the command to run
+        # finally set the command
         self.command = latter_part
 
