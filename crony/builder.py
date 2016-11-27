@@ -68,6 +68,7 @@ class Job(object):
     
     def __init__(self, job_line=""):
         # Set default values for all job fields
+        self.is_special = False
         self.command = ''
         self.comments = ''
         self.log_file = ''
@@ -102,20 +103,24 @@ class Job(object):
 
     @property
     def expression(self):
-        return "{0} {1} {2} {3} {4}".format(
-                        self.minute,
-                        self.hour,
-                        self.day_of_month,
-                        self.month,
-                        self.day_of_week)
+        if self.is_special:
+            exp = self._exp_fields[0]
+        else:
+            exp = "{0} {1} {2} {3} {4}".format(
+                            self.minute,
+                            self.hour,
+                            self.day_of_month,
+                            self.month,
+                            self.day_of_week)
+        return exp
 
     @expression.setter
     def expression(self, expression):
         """Set the crontab expression"""
-        if type(expression) is list:
-            self._exp_fields = expression
-        else:
-            self._exp_fields = expression.split()
+        if expression.startswith('@'):
+            self.is_special = True
+
+        self._exp_fields = expression.split()
 
     @property
     def line(self):
@@ -133,14 +138,27 @@ class Job(object):
 
         return cron_string
 
+    def _split_line(self, job_line):
+        """Split a job line in two, ie. (exp, line)"""
+        crontab_pieces = job_line.split()
+        if crontab_pieces[0].startswith('@'):
+            needle = 1
+        else:
+            needle = 5
+
+        exp = ' '.join(crontab_pieces[:needle])
+        line = ' '.join(crontab_pieces[needle:])
+        return exp, line
+
     @line.setter
     def line(self, job_line):
         """Parse a crontab line"""
-        crontab_pieces = job_line.split()
-
         # strip the expression from the job line
-        self.expression = crontab_pieces[:5]
-        latter_part = ' '.join(crontab_pieces[5:])
+        self.expression, latter_part = self._split_line(job_line)
+
+        # # strip the expression from the job line
+        # self.expression = crontab_pieces[:5]
+        # latter_part = ' '.join(crontab_pieces[5:])
 
         delim_map = OrderedDict([
             ('#', 'comments'),

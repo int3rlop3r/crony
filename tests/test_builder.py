@@ -57,6 +57,7 @@ class TestJobs(unittest.TestCase):
         self.job3 = Job("* * * * * job3")
         self.job4 = Job("* * * * * job4")
         self.job5 = Job("* * * * * job5")
+        self.job6 = Job("@reboot job5")
 
     def test_add(self):
         # test jobs from constructor
@@ -75,17 +76,25 @@ class TestJobs(unittest.TestCase):
         jobs.clear_all()
 
     def test_get(self):
-        jobs = Jobs([self.job1, self.job2, self.job3, self.job4, self.job5])
+        jobs = Jobs([
+            self.job1,
+            self.job2,
+            self.job3,
+            self.job4,
+            self.job5,
+            self.job6,
+        ])
 
         self.assertEquals(self.job1, jobs.get(1))
         self.assertEquals(self.job2, jobs.get(2))
         self.assertEquals(self.job3, jobs.get(3))
         self.assertEquals(self.job4, jobs.get(4))
         self.assertEquals(self.job5, jobs.get(5))
+        self.assertEquals(self.job6, jobs.get(6))
 
     def test_merge(self):
         jobsa = Jobs([self.job1, self.job2, self.job3])
-        jobsb = Jobs([self.job4, self.job5])
+        jobsb = Jobs([self.job4, self.job5, self.job6])
 
         jobsa.merge(jobsb)
         self.assertEquals(self.job1, jobsa.get(1))
@@ -93,26 +102,48 @@ class TestJobs(unittest.TestCase):
         self.assertEquals(self.job3, jobsa.get(3))
         self.assertEquals(self.job4, jobsa.get(4))
         self.assertEquals(self.job5, jobsa.get(5))
+        self.assertEquals(self.job6, jobsa.get(6))
 
     def test_in_ids(self):
-        jobs = Jobs([self.job1, self.job2, self.job3, self.job4, self.job5])
+        jobs = Jobs([
+            self.job1,
+            self.job2,
+            self.job3,
+            self.job4,
+            self.job5,
+            self.job6,
+        ])
 
-        subjobs = jobs.in_ids([1, 2, 5])
+        subjobs = jobs.in_ids([1, 2, 6])
         self.assertEquals(self.job1, subjobs.get(1))
         self.assertEquals(self.job2, subjobs.get(2))
-        self.assertEquals(self.job5, subjobs.get(3))
+        self.assertEquals(self.job6, subjobs.get(3))
 
     def test_all(self):
-        joblist = [self.job1, self.job2, self.job3, self.job4, self.job5]
+        joblist = [
+            self.job1,
+            self.job2,
+            self.job3,
+            self.job4,
+            self.job5,
+            self.job6,
+        ]
+
         jobs = Jobs(joblist)
         self.assertEquals(joblist, jobs.all())
 
     def test_remove(self):
-        joblist = [self.job1, self.job2, self.job3, self.job4, self.job5]
-        jobs = Jobs(joblist[:])
+        joblist = [
+            self.job1,
+            self.job2,
+            self.job3,
+            self.job4,
+            self.job5,
+            self.job6,
+        ]
 
-        #remove job1
-        joblist.remove(self.job1)
+        jobs = Jobs(joblist[:])
+        joblist.remove(self.job1) #remove job1
         jobs.remove(self.job1)
         self.assertEquals(jobs.all(), joblist)
 
@@ -122,7 +153,15 @@ class TestJobs(unittest.TestCase):
         self.assertEquals(len(jobs), 0)
     
     def test_iterator(self):
-        joblist = [self.job1, self.job2, self.job3, self.job4, self.job5]
+        joblist = [
+            self.job1,
+            self.job2,
+            self.job3,
+            self.job4,
+            self.job5,
+            self.job6,
+        ]
+
         jobs = Jobs(joblist[:])
         for index, job in enumerate(jobs):
             self.assertEquals(job.line, joblist[index].line)
